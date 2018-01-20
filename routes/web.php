@@ -23,4 +23,8 @@ Route::group(['middleware'=>'auth','prefix'=>'api/v1'], function()
 {
   Route::get('/classrooms','API\V1\ClassRoomController@index');
   Route::get('/students','API\V1\ClassRoomController@students');
+  Route::get('/exams','API\V1\ExamController@index');
+  Route::post('/exam/create','API\V1\ExamController@store');
+  Route::get('/subjects','API\V1\ExamController@show');
+  Route::get('/exam','API\V1\ExamController@exam');
 });

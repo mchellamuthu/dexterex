@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ExamsCollection extends ResourceCollection
+class SubjectsCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,12 +14,12 @@ class ExamsCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->collection->map(function($item){
+        return $this->collection->transform(function($item){
           return [
             '_id'=>$item->id,
-            'title'=>$item->title,
-            'maximum_mark'=>$item->maximum_marks,
-            'pass_mark'=>$item->pass_marks,
+            'name'=>$item->name,
+            'mark'=>$item->maximum_marks,
+            'code'=>$item->code,
           ];
         });
     }

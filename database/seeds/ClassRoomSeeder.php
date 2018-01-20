@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use App\ClassRoom;
+use App\Student;
+use App\User;
 class ClassRoomSeeder extends Seeder
 {
     /**
@@ -13,10 +15,11 @@ class ClassRoomSeeder extends Seeder
     {
 
 
-        $user_id = "42cdf31e-fd87-5214-b021-4ba9eab29e51";
+        $user = User::first();
+        
         for ($i=1; $i <= 10 ; $i++) {
-          ClassRoom::create([
-            'user_id'=>$user_id,
+          $classroom = ClassRoom::create([
+            'user_id'=>$user->id,
             'name'=>"Class Room ".$i,
             'avatar'=>"class".$i.".png",
             "section"=>$i." Year"

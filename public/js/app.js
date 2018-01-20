@@ -45829,6 +45829,10 @@ var routes = [{
     path: '/classroom/:classId',
     component: __webpack_require__(49),
     props: true
+}, {
+    path: '/exam/:examId',
+    component: __webpack_require__(67),
+    props: true
 }];
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
@@ -46142,7 +46146,7 @@ exports = module.exports = __webpack_require__(12)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -46168,32 +46172,204 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['classId'],
   data: function data() {
     return {
-      students: []
+      exams: [],
+      selectedSubject: '',
+      subjects: [{
+        name: '',
+        code: '',
+        mark: '',
+        papers: []
+      }],
+
+      examInputs: {},
+      formErrors: {},
+      errorClass: "has-error",
+      papers: []
     };
   },
   mounted: function mounted() {
-    console.log("Component Mounted");
+    console.log("  // Describe error!Component Mounted");
   },
   created: function created() {
     //do something after creating vue instance
+
     console.log("Created");
-    this.fetchStudents();
+    this.fetchExams();
   },
 
   methods: {
-    fetchStudents: function fetchStudents() {
+    fetchExams: function fetchExams() {
       var _this = this;
 
-      axios.get('/api/v1/students?classroom=' + this.classId).then(function (response) {
+      axios.get('/api/v1/exams?classroom=' + this.classId).then(function (response) {
         console.log(response.data.data);
-        _this.students = response.data.data;
+        _this.exams = response.data.data;
       }).catch(function (error) {
         console.log(error);
+      });
+    },
+
+    addRow: function addRow(index) {
+      try {
+        this.subjects.push({
+          name: '',
+          code: '',
+          mark: '',
+          papers: []
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    removeRow: function removeRow(index) {
+      this.subjects.splice(index, 1);
+    },
+    addPaperRow: function addPaperRow(index) {
+      try {
+        this.selectedSubject.papers.push({
+          name: '',
+          code: '',
+          mark: '',
+          get_mark: ''
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    removePaperRow: function removePaperRow(index) {
+      this.selectedSubject.papers.splice(index, 1);
+      this.papers = this.subjects[index].papers;
+    },
+    addPaper: function addPaper(index) {
+      $('#PaperSModal').modal('show');
+      // console.log(index);
+      // $('#addbtn').attr("@click","submitPapers(index)");
+      console.log(index);
+      this.selectedSubject = this.subjects[index];
+      this.selectedSubject.index = index;
+      this.papers = this.subjects[index].papers;
+    },
+
+    submitPapers: function submitPapers(index) {
+      console.log(this.subjects[index].name);
+      this.subjects[index].papers = this.selectedSubject.papers;
+      $('#PaperSModal').modal('hide');
+    },
+    createExam: function createExam(e) {
+      var _this2 = this;
+
+      var form = e.srcElement;
+      this.examInputs.classroom = this.classId;
+      this.examInputs.subjects = this.subjects;
+      axios.post('/api/v1/exam/create', this.examInputs).then(function (response) {
+        _this2.exams.push(response.data.data);
+        $('#myModal').modal('hide');
+      }).catch(function (error) {
+        var errors = error.response.data.errors;
+        _this2.formErrors = errors;
+        $('form').find('.form-group').removeClass('has-error').find('.help-block').text('');
+        $.each(errors, function (field, msg) {
+          $('form').find('.' + field + '-group').addClass('has-error').find('.help-block').text(msg);
+        });
       });
     }
   }
@@ -46211,30 +46387,764 @@ var render = function() {
     _c(
       "div",
       { staticClass: "row" },
-      _vm._l(_vm.students, function(student) {
-        return _c("div", { key: student._id, staticClass: "col-md-3" }, [
-          _c("div", { staticClass: "panel panel-default" }, [
+      [
+        _vm._l(_vm.exams, function(exam) {
+          return _c("div", { key: exam._id, staticClass: "col-md-3" }, [
+            _c("div", { staticClass: "panel panel-default" }, [
+              _c(
+                "div",
+                { staticClass: "panel-body" },
+                [
+                  _c("h4", [_vm._v(_vm._s(exam.title))]),
+                  _vm._v(" "),
+                  _c("router-link", { attrs: { to: "/exam/" + exam._id } }, [
+                    _vm._v("Go")
+                  ])
+                ],
+                1
+              )
+            ])
+          ])
+        }),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            attrs: {
+              type: "button",
+              "data-toggle": "modal",
+              "data-target": "#myModal"
+            }
+          },
+          [_vm._v("ADD NEW")]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "myModal",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "myModalLabel"
+            }
+          },
+          [
             _c(
               "div",
-              { staticClass: "panel-body" },
+              {
+                staticClass: "modal-dialog modal-lg",
+                attrs: { role: "document" }
+              },
               [
-                _c("h4", [_vm._v(_vm._s(student.first_name))]),
-                _vm._v(" "),
-                _c(
-                  "router-link",
-                  { attrs: { to: "/students/" + student._id } },
-                  [_vm._v("Go")]
-                )
-              ],
-              1
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c(
+                      "form",
+                      {
+                        on: {
+                          submit: function($event) {
+                            $event.preventDefault()
+                            _vm.createExam($event)
+                          }
+                        }
+                      },
+                      [
+                        _c("div", { staticClass: "form-group title-group" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.examInputs.title,
+                                expression: "examInputs.title"
+                              }
+                            ],
+                            staticClass: "form-control ",
+                            attrs: {
+                              type: "text",
+                              name: "title",
+                              placeholder: "Title"
+                            },
+                            domProps: { value: _vm.examInputs.title },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.examInputs,
+                                  "title",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("input", {
+                            attrs: { type: "hidden", name: "classroom" },
+                            domProps: { value: _vm.classId }
+                          }),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "help-block" })
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group min_mark-group" },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.examInputs.min_mark,
+                                  expression: "examInputs.min_mark"
+                                }
+                              ],
+                              staticClass: "form-control min_mark",
+                              attrs: {
+                                type: "text",
+                                name: "min_mark",
+                                size: "4",
+                                placeholder: "min_mark"
+                              },
+                              domProps: { value: _vm.examInputs.min_mark },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.examInputs,
+                                    "min_mark",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("span", { staticClass: "help-block" })
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group max_mark-group" },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.examInputs.max_mark,
+                                  expression: "examInputs.max_mark"
+                                }
+                              ],
+                              staticClass: "form-control max_mark",
+                              attrs: {
+                                type: "text",
+                                name: "max_mark",
+                                size: "4",
+                                placeholder: "max_mark"
+                              },
+                              domProps: { value: _vm.examInputs.max_mark },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.examInputs,
+                                    "max_mark",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("span", { staticClass: "help-block" })
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("hr"),
+                        _vm._v(" "),
+                        _c("h4", [
+                          _vm._v("Subjects "),
+                          _c(
+                            "span",
+                            {
+                              staticClass: "btn btn-primary btn-sm",
+                              on: {
+                                click: function($event) {
+                                  _vm.addRow(_vm.$index)
+                                }
+                              }
+                            },
+                            [
+                              _c("i", {
+                                staticClass: "glyphicon glyphicon-plus-sign"
+                              })
+                            ]
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "table",
+                          { staticClass: "table", attrs: { border: "0" } },
+                          [
+                            _vm._m(1),
+                            _vm._v(" "),
+                            _c(
+                              "tbody",
+                              _vm._l(_vm.subjects, function(subject, index) {
+                                return _c(
+                                  "tr",
+                                  {
+                                    key: subject.key,
+                                    attrs: { "track-by": "$index" }
+                                  },
+                                  [
+                                    _c(
+                                      "td",
+                                      [
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: subject.name,
+                                              expression: "subject.name"
+                                            }
+                                          ],
+                                          staticClass: "form-control input-sm",
+                                          attrs: {
+                                            type: "text",
+                                            name: "subjects[name]"
+                                          },
+                                          domProps: { value: subject.name },
+                                          on: {
+                                            input: function($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                subject,
+                                                "name",
+                                                $event.target.value
+                                              )
+                                            }
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _vm._l(subject.papers, function(paper) {
+                                          return _c(
+                                            "span",
+                                            {
+                                              key: paper.key,
+                                              staticClass: "label label-primary"
+                                            },
+                                            [
+                                              _vm._v(
+                                                _vm._s(paper.name) +
+                                                  " : " +
+                                                  _vm._s(paper.mark)
+                                              )
+                                            ]
+                                          )
+                                        })
+                                      ],
+                                      2
+                                    ),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: subject.code,
+                                            expression: "subject.code"
+                                          }
+                                        ],
+                                        staticClass: "form-control input-sm",
+                                        attrs: {
+                                          type: "text",
+                                          name: "subjects[code]",
+                                          size: "4"
+                                        },
+                                        domProps: { value: subject.code },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              subject,
+                                              "code",
+                                              $event.target.value
+                                            )
+                                          }
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: subject.mark,
+                                            expression: "subject.mark"
+                                          }
+                                        ],
+                                        staticClass: "form-control input-sm",
+                                        attrs: {
+                                          type: "text",
+                                          name: "subjects[mark]",
+                                          size: "4"
+                                        },
+                                        domProps: { value: subject.mark },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              subject,
+                                              "mark",
+                                              $event.target.value
+                                            )
+                                          }
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c(
+                                        "button",
+                                        {
+                                          staticClass: "btn btn-success btn-sm",
+                                          attrs: { type: "button" },
+                                          on: {
+                                            click: function($event) {
+                                              _vm.addPaper(index)
+                                            }
+                                          }
+                                        },
+                                        [_vm._v("ADD PAPER")]
+                                      )
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("td", [
+                                      _c(
+                                        "span",
+                                        {
+                                          staticClass: "btn btn-primary btn-sm",
+                                          on: {
+                                            click: function($event) {
+                                              _vm.addRow(index)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass:
+                                              "glyphicon glyphicon-plus-sign"
+                                          })
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "span",
+                                        {
+                                          staticClass: "btn btn-danger btn-sm",
+                                          on: {
+                                            click: function($event) {
+                                              _vm.removeRow(index)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass:
+                                              "glyphicon  glyphicon-remove-circle"
+                                          })
+                                        ]
+                                      )
+                                    ])
+                                  ]
+                                )
+                              })
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "submit" }
+                          },
+                          [_vm._v("create")]
+                        )
+                      ]
+                    )
+                  ])
+                ])
+              ]
             )
-          ])
-        ])
-      })
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "PaperSModal",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "PaperSModalLabel"
+            }
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "modal-dialog", attrs: { role: "document" } },
+              [
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("form", [
+                      _c("h4", [
+                        _vm._v("ADD PAPERS FOR "),
+                        _c("span", { attrs: { id: "subject_name" } }, [
+                          _vm._v(_vm._s(_vm.selectedSubject.name))
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "span",
+                          {
+                            staticClass: "btn btn-primary btn-sm",
+                            on: {
+                              click: function($event) {
+                                _vm.addPaperRow(_vm.$index)
+                              }
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass: "glyphicon glyphicon-plus-sign"
+                            })
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "table",
+                        { staticClass: "table", attrs: { border: "0" } },
+                        [
+                          _vm._m(3),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.papers, function(paper, index) {
+                              return _c(
+                                "tr",
+                                {
+                                  key: paper.key,
+                                  attrs: { "track-by": "$index" }
+                                },
+                                [
+                                  _c("td", [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: paper.name,
+                                          expression: "paper.name"
+                                        }
+                                      ],
+                                      staticClass: "form-control input-sm",
+                                      attrs: {
+                                        type: "text",
+                                        name: "papers[name]"
+                                      },
+                                      domProps: { value: paper.name },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            paper,
+                                            "name",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: paper.code,
+                                          expression: "paper.code"
+                                        }
+                                      ],
+                                      staticClass: "form-control input-sm",
+                                      attrs: {
+                                        type: "text",
+                                        name: "papers[code]",
+                                        size: "4"
+                                      },
+                                      domProps: { value: paper.code },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            paper,
+                                            "code",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: paper.mark,
+                                          expression: "paper.mark"
+                                        }
+                                      ],
+                                      staticClass: "form-control input-sm",
+                                      attrs: {
+                                        type: "text",
+                                        name: "papers[mark]",
+                                        size: "4"
+                                      },
+                                      domProps: { value: paper.mark },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            paper,
+                                            "mark",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: paper.get_mark,
+                                          expression: "paper.get_mark"
+                                        }
+                                      ],
+                                      staticClass: "form-control input-sm",
+                                      attrs: {
+                                        type: "text",
+                                        name: "papers[get_mark]",
+                                        size: "4"
+                                      },
+                                      domProps: { value: paper.get_mark },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            paper,
+                                            "get_mark",
+                                            $event.target.value
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _c(
+                                      "span",
+                                      {
+                                        staticClass: "btn btn-primary btn-sm",
+                                        on: {
+                                          click: function($event) {
+                                            _vm.addPaperRow(index)
+                                          }
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "glyphicon glyphicon-plus-sign"
+                                        })
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "span",
+                                      {
+                                        staticClass: "btn btn-danger btn-sm",
+                                        on: {
+                                          click: function($event) {
+                                            _vm.removePaperRow(index)
+                                          }
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "glyphicon  glyphicon-remove-circle"
+                                        })
+                                      ]
+                                    )
+                                  ])
+                                ]
+                              )
+                            })
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.submitPapers(_vm.selectedSubject.index)
+                            }
+                          }
+                        },
+                        [_vm._v("Finish")]
+                      )
+                    ])
+                  ])
+                ])
+              ]
+            )
+          ]
+        )
+      ],
+      2
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+      _vm._v(" "),
+      _c("h4", { staticClass: "modal-title", attrs: { id: "myModalLabel" } }, [
+        _vm._v("Create New Exam")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { attrs: { border: "0" } }, [
+      _c("tr", [
+        _c("th", [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Code")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Mark")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Papers")]),
+        _vm._v(" "),
+        _c("th")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+      _vm._v(" "),
+      _c(
+        "h4",
+        { staticClass: "modal-title", attrs: { id: "PaperSModalLabel" } },
+        [_vm._v("Create New Exam")]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { attrs: { border: "0" } }, [
+      _c("tr", [
+        _c("th", [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Code")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Mark")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Get Mark")]),
+        _vm._v(" "),
+        _c("th")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -46368,6 +47278,407 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(68)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(70)
+/* template */
+var __vue_template__ = __webpack_require__(71)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/Exams/Exam.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-fcbc5c9e", Component.options)
+  } else {
+    hotAPI.reload("data-v-fcbc5c9e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(69);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("5f36fcc0", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fcbc5c9e\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exam.vue", function() {
+     var newContent = require("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fcbc5c9e\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Exam.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['examId'],
+  data: function data() {
+    return {
+      subjects: '',
+      students: '',
+      exam: '',
+      classId: ''
+
+    };
+  },
+  created: function created() {
+    this.getExamInfo();
+    this.fetchSubjects();
+  },
+
+  methods: {
+    getExamInfo: function getExamInfo() {
+      var _this = this;
+
+      axios.get('/api/v1/exam?exam=' + this.examId).then(function (response) {
+        _this.exam = response.data.data;
+        _this.classId = response.data.data.classroom;
+        _this.fetchStudents();
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    fetchSubjects: function fetchSubjects() {
+      var _this2 = this;
+
+      axios.get('/api/v1/subjects?exam=' + this.examId).then(function (response) {
+        _this2.subjects = response.data.data;
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    fetchStudents: function fetchStudents() {
+      var _this3 = this;
+
+      axios.get('/api/v1/students?classroom=' + this.classId).then(function (response) {
+        _this3.students = response.data.data;
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    showModal: function showModal() {
+      $("#AllSubjects").modal('show');
+    }
+  }
+});
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c(
+      "div",
+      { staticClass: "row" },
+      [
+        _c("div", { staticClass: "col-md-3" }, [
+          _c("div", { staticClass: "panel panel-default" }, [
+            _c("div", { staticClass: "panel-body" }, [
+              _c("h4", [_vm._v("All Subjects")]),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  attrs: { href: "javascript:;" },
+                  on: { click: _vm.showModal }
+                },
+                [_vm._v("Go")]
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _vm._l(_vm.subjects, function(subject) {
+          return _c("div", { key: subject._id, staticClass: "col-md-3" }, [
+            _c("div", { staticClass: "panel panel-default" }, [
+              _c(
+                "div",
+                { staticClass: "panel-body" },
+                [
+                  _c("h4", [_vm._v(_vm._s(subject.name))]),
+                  _vm._v(" "),
+                  _c(
+                    "router-link",
+                    { attrs: { to: "/marks/subject/" + subject._id } },
+                    [_vm._v("Go")]
+                  )
+                ],
+                1
+              )
+            ])
+          ])
+        })
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "AllSubjects",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "AllSubjectsLabel"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog modal-lg", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "modal-body", staticStyle: { padding: "0px" } },
+                [
+                  _c(
+                    "form",
+                    {
+                      on: {
+                        submit: function($event) {
+                          $event.preventDefault()
+                          _vm.updateResult($event)
+                        }
+                      }
+                    },
+                    [
+                      _c("table", { staticClass: "table table-bordered" }, [
+                        _c("thead", [
+                          _c(
+                            "tr",
+                            [
+                              _c("th", [_vm._v("Roll No")]),
+                              _vm._v(" "),
+                              _c("th", [_vm._v("Name")]),
+                              _vm._v(" "),
+                              _vm._l(_vm.subjects, function(subject) {
+                                return _c("th", { key: subject.key }, [
+                                  _vm._v(_vm._s(subject.name))
+                                ])
+                              })
+                            ],
+                            2
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          _vm._l(_vm.students, function(student) {
+                            return _c(
+                              "tr",
+                              { key: student.key },
+                              [
+                                _c("td", [_vm._v(_vm._s(student.rollno))]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(student.first_name) +
+                                      " " +
+                                      _vm._s(student.last_name)
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _vm._l(_vm.subjects, function(subject) {
+                                  return _c("td", { key: subject.key }, [
+                                    _c("input", {
+                                      attrs: {
+                                        type: "text",
+                                        name: "subject[]",
+                                        size: "3"
+                                      }
+                                    })
+                                  ])
+                                })
+                              ],
+                              2
+                            )
+                          })
+                        )
+                      ])
+                    ]
+                  )
+                ]
+              )
+            ])
+          ]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+      _vm._v(" "),
+      _c(
+        "h4",
+        { staticClass: "modal-title", attrs: { id: "AllSubjectsLabel" } },
+        [_vm._v("Update All Subject Marks")]
+      )
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-fcbc5c9e", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

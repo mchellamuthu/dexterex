@@ -17,7 +17,7 @@ class CreateSubjectsTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('class_room_id')->nullable();
             $table->uuid('user_id');
-            $table->uuid('subject_group_id')->nullable();
+            $table->uuid('exam_id')->nullable();
             $table->string('name');
             $table->string('code');
             $table->integer('maximum_marks');

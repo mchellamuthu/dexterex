@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class ExamResource extends Resource
+class SubjectResource extends Resource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,9 @@ class ExamResource extends Resource
     {
         return [
           '_id'=>$this->id,
-          'title'=>$this->title,
-          'maximum_mark'=>$this->maximum_marks,
-          'pass_mark'=>$this->pass_marks,
-          'classroom'=>$this->classroom->id,
+          'name'=>$this->name,
+          'mark'=>$this->mark,
+          'code'=>$this->code,
         ];
     }
 }

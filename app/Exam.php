@@ -15,6 +15,10 @@ class Exam extends Model
 
   public function classroom()
   {
-    return $this->belongsTo(ClassRoom::class);
+    return $this->belongsTo(ClassRoom::class,'class_room_id','id');
+  }
+  public function subjects()
+  {
+    return $this->hasMany(Subject::class,'exam_id','id');
   }
 }

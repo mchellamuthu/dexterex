@@ -18,7 +18,6 @@ class CreateSubjectGroupsTable extends Migration
             $table->uuid('class_room_id')->nullable();
             $table->uuid('user_id');
             $table->string('group_name');
-            $table->integer('maximum_marks');
             $table->timestamps();
         });
     }

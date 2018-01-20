@@ -20,4 +20,9 @@ class ClassRoom extends Model
     {
       return $this->belongsToMany('App\Student','student_class_rooms')->withTimestamps();
     }
+
+    public function exams()
+    {
+      return $this->hasMany('App\Exam','class_room_id','id');
+    }
 }
